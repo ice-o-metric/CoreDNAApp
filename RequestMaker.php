@@ -2,7 +2,7 @@
     class RequestMaker{
         //based on https://stackoverflow.com/questions/8596311/how-to-make-a-post-request-without-curl
         
-        function Request($url, $type = 'GET', $data = null, $header = '') {
+        public function Request($url, $type = 'GET', $data = null, $header = '') {
             if (gettype($type) == 'string') {
                 //Ensure correct matching on the SWITCH statement by eliminating case
                 $type = strtoupper($type);
@@ -56,7 +56,7 @@
                 
                 if (is_array($data)) {
                     if ($postType === 'JSON') {
-                        //Check we can encode
+                        //Encode for sending
                         $data = json_encode($data);
 
                         $err = json_last_error_msg();
@@ -81,12 +81,6 @@
                         }
                     }
                 }
-                
-                echo print_r(array(
-                        'method'  => $type,
-                        'header'  => $header,
-                        'content' => $data
-                    ));
 
                 $opts = array('http' =>
                     array(
