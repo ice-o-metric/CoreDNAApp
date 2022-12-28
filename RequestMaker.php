@@ -1,6 +1,8 @@
 <?php
     class RequestMaker{
-        function Request($url, $type = 'GET', $data = null, $header = '') {
+        //based on https://stackoverflow.com/questions/8596311/how-to-make-a-post-request-without-curl
+		
+		function Request($url, $type = 'GET', $data = null, $header = '') {
             if (gettype($type) == 'string') {
                 //Ensure correct matching on the SWITCH statement by eliminating case
                 $type = strtoupper($type);
@@ -16,7 +18,8 @@
                 case 'TRACE':
                     break;
                 case 'POST':
-                    $header .= "Content-type: application/x-www-form-urlencoded\r\n";
+                    if ($header != '') $header .= "\r\n";
+					$header .= 'Content-type: application/x-www-form-urlencoded';
                     break;
                 
                 default:
