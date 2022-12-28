@@ -1,8 +1,21 @@
 <?php
+		/**
+		* AssessmentEndpoint performs the request described in the CoreDNA coding test
+		* 
+		* AssessmentEndpoint uses RequestMaker to handle the request described in the CoreDNA coding test
+		*/
     class AssessmentEndpoint{
-        //based on https://stackoverflow.com/questions/8596311/how-to-make-a-post-request-without-curl
         
-        function SendAndOutput($name, $email, $git) {
+        
+        /**
+		 * SendAndOutput takes the 3 arguments described by the CoreDNA coding test and sends them to their proscribed URI, outputting feedback
+		 *
+		 * @param string $name
+		 * @param string $email
+		 * @param string $git
+		 * @access public
+		 */
+		public function SendAndOutput($name, $email, $git) {
             require_once('RequestMaker.php');
             
             $connector = new RequestMaker();
@@ -24,7 +37,7 @@
             
             $response = $connector->Request('https://corednacom.corewebdna.com/assessment-endpoint.php', 'POST', $data, $header);
             
-            echo '<p>RESPONCE:' . json_encode($response) . '</p>';
+            echo '<p>RESPONSE:' . json_encode($response) . '</p>';
             
             echo '<p>Done</p>';
         }
