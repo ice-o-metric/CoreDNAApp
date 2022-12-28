@@ -1,6 +1,6 @@
 <?php
     class RequestMaker{
-        function Request($url, $data = null, $type = 'GET', $header = '') {
+        function Request($url, $type = 'GET', $data = null, $header = '') {
             if (gettype($type) == 'string') {
                 //Ensure correct matching on the SWITCH statement by eliminating case
                 $type = strtoupper($type);
@@ -68,6 +68,8 @@
             }
             $context  = stream_context_create($opts);
             $result = file_get_contents($url, false, $context);
+			
+			return $result;
         }
     }
 ?>
