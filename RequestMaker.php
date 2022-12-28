@@ -1,8 +1,25 @@
 <?php
-    class RequestMaker{
-        //based on https://stackoverflow.com/questions/8596311/how-to-make-a-post-request-without-curl
+    /**
+	* RequestMaker is a class for making simple HTTP calls 
+	* 
+	* RequestMaker is a class to simplify logic on making certain HTTP requests, 
+	* based on https://stackoverflow.com/questions/8596311/how-to-make-a-post-request-without-curl
+	*/
+	
+	class RequestMaker{
+        //
         
-        public function Request($url, $type = 'GET', $data = null, $header = '') {
+        /**
+		 * Make a HTTP request
+		 *
+		 * @param string $url
+		 * @param string $type
+		 * @param mixed $data
+		 * @param string $header
+		 * @return string Response text
+		 * @access public
+		 */
+		public function Request($url, $type = 'GET', $data = null, $header = '') {
             if (gettype($type) == 'string') {
                 //Ensure correct matching on the SWITCH statement by eliminating case
                 $type = strtoupper($type);
@@ -48,7 +65,7 @@
                         if ($err != "No error") {
                             throw new Exception('Error converting object: ' . $err, 1);
                         }
-                    } else if ($postType === 'FORM') {
+                    } elseif ($postType === 'FORM') {
                         //change to associative array
                         $data = json_decode(json_encode($data), true);
                     }
@@ -63,7 +80,7 @@
                         if ($err != "No error") {
                             throw new Exception('Error converting object: ' . $err, 1);
                         }
-                    } else if ($postType === 'FORM') {
+                    } elseif ($postType === 'FORM') {
                         //Encode for sending
                         $data = http_build_query($data);
                     }
