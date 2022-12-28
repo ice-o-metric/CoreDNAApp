@@ -1,12 +1,19 @@
 <?php
     class RequestMaker{
         //based on https://stackoverflow.com/questions/8596311/how-to-make-a-post-request-without-curl
-		
-		function Request($url, $type = 'GET', $data = null, $header = '') {
+        
+        function Request($url, $type = 'GET', $data = null, $header = '') {
             if (gettype($type) == 'string') {
                 //Ensure correct matching on the SWITCH statement by eliminating case
                 $type = strtoupper($type);
             }
+            
+            $postType = 'FORM';
+            if (strpos($header, 'Content-type: application/json') !== false) {
+                $postType = 'JSON';
+            }
+            
+            
             switch ($type) {
                 case 'GET':
                 case 'PUT':
@@ -18,8 +25,10 @@
                 case 'TRACE':
                     break;
                 case 'POST':
-                    if ($header != '') $header .= "\r\n";
-					$header .= 'Content-type: application/x-www-form-urlencoded';
+                    if (strpos($header, 'Content-type:') == false) {
+                        if ($header != '') $header .= "\r\n";
+                        $header .= 'Content-type: application/x-www-form-urlencoded';
+                    }
                     break;
                 
                 default:
@@ -32,32 +41,58 @@
                 //Handle Postdata
 
                 if (is_object($data)) {
-                    //Convert object to json so we can recursively convert it to an associative array
-                    $data = json_encode($data);
+                    if ($postType === 'JSON') {
+                        $data = json_encode($data);
 
-                    $err = json_last_error_msg();
-                    if ($err != "No error") {
-                        throw new Exception('Error converting object: ' . $err, 1);
+                        $err = json_last_error_msg();
+                        if ($err != "No error") {
+                            throw new Exception('Error converting object: ' . $err, 1);
+                        }
+                    } else if ($postType === 'FORM') {
+                        //change to associative array
+                        $data = json_decode(json_encode($data), true);
+                    }
+                }
+                
+                if (is_array($data)) {
+                    if ($postType === 'JSON') {
+                        //Check we can encode
+                        $data = json_encode($data);
+
+                        $err = json_last_error_msg();
+                        if ($err != "No error") {
+                            throw new Exception('Error converting object: ' . $err, 1);
+                        }
+                    } else if ($postType === 'FORM') {
+                        //Encode for sending
+                        $data = http_build_query($data);
                     }
                 }
                 
                 if (gettype($data) == 'string') {
-                    $data = json_decode($data, true);
+                    
+                    if ($postType === 'JSON') {
+                        //Check we can successfully decode
+                        $temp = json_decode($data, true);
 
-                    $err = json_last_error_msg();
-                    if ($err != "No error") {
-                        throw new Exception('Invalid JSON Post Data: ' . $err, 1);
+                        $err = json_last_error_msg();
+                        if ($err != "No error") {
+                            throw new Exception('Invalid JSON Post Data: ' . $err, 1);
+                        }
                     }
                 }
-
-                //$data SHOULD be an associative array at this point
-                $postdata = http_build_query($data);
+                
+                echo print_r(array(
+                        'method'  => $type,
+                        'header'  => $header,
+                        'content' => $data
+                    ));
 
                 $opts = array('http' =>
                     array(
                         'method'  => $type,
                         'header'  => $header,
-                        'content' => $postdata
+                        'content' => $data
                     )
                 );
             } else {
@@ -71,8 +106,8 @@
             }
             $context  = stream_context_create($opts);
             $result = file_get_contents($url, false, $context);
-			
-			return $result;
+            
+            return $result;
         }
     }
 ?>
