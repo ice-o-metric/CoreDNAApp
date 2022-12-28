@@ -7,8 +7,6 @@
 	*/
 	
 	class RequestMaker{
-        //
-        
         /**
 		 * Make a HTTP request
 		 *
